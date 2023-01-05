@@ -40,13 +40,17 @@ score = 0
 fon_music = pygame.mixer.Sound('data/music/(fon)e4c1fdca51422a9.mp3')
 # Начинаем проигровать фоновую музыку
 fon_music.play(loops=-1)
+fon2_music = pygame.mixer.Sound('data/music/(fon)48bb90af8e1e401.mp3')
 # Добавим звук прыжка
 jump_music = pygame.mixer.Sound('data/music/cartoon-spring-boing-03 (mp3cut.net)(jump).mp3')
+# Добавляем звук проигрыша
+lose_music = pygame.mixer.Sound('data/music/jg-032316-sfx-video-game-game-over-3.mp3')
 # ----------------------------------------------------------------
 # Дообавляем фон нашей игры
 # ----------------------------------------------------------------
 # Добалем фоновое изображение для старта игры
 start_fon = pygame.image.load('data/start_screen/210420200620119050.jpg')
+lose_fon = pygame.image.load('data/lose_screen/iow_dinosaurisle.jpg')
 # Добавляем небо
 # sky = pygame.image.load("data/sky/sky.png")
 # Добавлем землю
@@ -127,8 +131,11 @@ def start_screen():
     text_coord = 15
     # Выводим текст
     for line in intro_text:
+        # Если это название, то пишем его по другому
         if line == 'Dino 2.0':
+            # Выставляем шрифт
             font2 = pygame.font.Font('data/font/Motel King Medium(RUS by Slavchansky).ttf', 57)
+            # Рендарим текст
             string_rendered = font2.render(line, 1, pygame.Color('red'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
@@ -137,12 +144,14 @@ def start_screen():
             text_coord += intro_rect.height
             text_coord += 125
         else:
+            # Рендарим текст
             string_rendered = font.render(line, 1, pygame.Color('Green'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
             intro_rect.x = 10
             text_coord += intro_rect.height
+        # Рисуем наш текст
         screen.blit(string_rendered, intro_rect)
 
     # Запускаем наше окно
@@ -158,13 +167,88 @@ def start_screen():
         clock.tick(FPS)
 
 
+def display_score():
+    pass
+def lose_screen():
+    # Пропишем нужный нам текст
+    intro_text = ["Dino 2.0",
+                  '1',
+                  "Вы проиграли,",
+                  "попробуйте еще раз.",
+                  'Для этого нажмите на пробел',
+                  'и игра пойдет заново!']
+    # Подбирем фон
+    fon = pygame.transform.scale(lose_fon, (800, 400))
+    # Нарисуем наш фон
+    screen.blit(fon, (0, 0))
+    sh = pygame.font.Font('data/font/Sonic 1 Title Screen Filled.ttf', 4)
+    # Выставляем шрифт
+    font = pygame.font.Font('data/font/Sonic 1 Title Screen Filled.ttf', size_shrift)
+    # Выставлям координаты текста
+    text_coord = 15
+    # Выводим текст
+    for line in intro_text:
+        # Если это название то пишем его по другому
+        if line == 'Dino 2.0':
+            # Выставляем шрифт
+            font2 = pygame.font.Font('data/font/Motel King Medium(RUS by Slavchansky).ttf', 57)
+            # Рендарим текст
+            string_rendered = font2.render(line, 1, pygame.Color('red'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 230
+            text_coord += intro_rect.height
+            text_coord += 15
+        elif line == '1':
+            # Выставляем шрифт
+            font4 = pygame.font.Font('data/font/MultiroundPro.otf', 59)
+            # Рендарим текст
+            string_rendered = font4.render(f'Ваш результат {score}.', 1, pygame.Color('yellow'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 130
+            text_coord += intro_rect.height
+            text_coord += 15
+        elif line != '1' and line != 'Dino 2.0':
+            font3 = pygame.font.Font('data/font/DolomanPavljenko.otf', 45)
+            # Рендарим текст
+            string_rendered = font3.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+        # Рисуем наш текст
+        screen.blit(string_rendered, intro_rect)
+
+game_active = False
 start_screen()
-r = True
-while r:
+fon_music.stop()
+fon2_music.play(loops=-1)
+runn = True
+while runn:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            r = False
+            runn = False
+        if game_active:
+            pass
+        else:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                game_active = True
+                start_time  = int(pygame.time.get_ticks() / 1000)
+
     screen.fill((0, 0, 0))
+    if game_active:
+        screen.fill((0, 0, 0))
+        #screen.blit(sky, (0, 0))
+        #screen.blit(land, (0, 300))
+        #score = display_score()
+
+    else:
+        lose_screen()
+
     clock.tick(FPS)
     pygame.display.flip()
 pygame.quit()
