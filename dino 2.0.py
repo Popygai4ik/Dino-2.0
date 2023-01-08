@@ -50,58 +50,59 @@ lose_music = pygame.mixer.Sound('data/music/jg-032316-sfx-video-game-game-over-3
 # ----------------------------------------------------------------
 # Добалем фоновое изображение для старта игры
 start_fon = pygame.image.load('data/start_screen/210420200620119050.jpg')
+# Добалем фоновое изображение для смерти в игре
 lose_fon = pygame.image.load('data/lose_screen/iow_dinosaurisle.jpg')
 # Добавляем небо
-# sky = pygame.image.load("data/sky/sky.png")
+sky = pygame.image.load("data/sky/небо для игры.png")
 # Добавлем землю
-# land = pygame.image.load("/data/land/land.png")
+land = pygame.image.load("data/land/земля для игры.png")
 # ----------------------------------------------------------------
 # Дообавляем динозаврика в нашу игру
 # ----------------------------------------------------------------
 #  Добавляем 1 изображение динозаврика
-# dino_walk_1 = pygame.image.load('/data/dino/dino_walk_1.png').convert_alpha()
+dino_walk_1 = pygame.image.load('data/dino/динозавр для игры 2(бег).png').convert_alpha()
 # Добавляем 2 изображение динозаврика
-# dino_walk_2 = pygame.image.load('/data/dino/dino_walk_2.png').convert_alpha()
+dino_walk_2 = pygame.image.load('data/dino/динозавр для игры 3(бег).png').convert_alpha()
 # Объединяем изображения динозаврика
-# dino_walk = [dino_walk_1, dino_walk_2]
+dino_walk = [dino_walk_1, dino_walk_2]
 # Добавляем значение бега динозаврика
 dino_walk_index = 0
 # Добавляем изображение прыжка динозаврика
-# dino_jump = pygame.image.load('data/dino/jump.png').convert_alpha()
+dino_jump = pygame.image.load('data/dino/динозавр для игры 4(прыжок).png').convert_alpha()
 # Добавляем анимацию
-# dino_surf = dino_walk[dino_walk_index]
+dino_surf = dino_walk[dino_walk_index]
 # Добавлем к динозаврику квадрат
-# dino_rect = dino_surf.get_rect(midbottom=(80, 300))
+dino_rect = dino_surf.get_rect(midbottom=(80, 300))
 # Добавлем гравитацию динозаврику
 dino_gravity = 0
 # ----------------------------------------------------------------
 # Добавляем паучка в нашу игру
 # ----------------------------------------------------------------
 #  Добавляем 1 изображение
-# spider_frame_1 = pygame.image.load('data/spider/spider1.png').convert_alpha()
+spider_frame_1 = pygame.image.load('data/spider/паук для игры 1.png').convert_alpha()
 # Добавляем 2 изображение
-# spider_frame_2 = pygame.image.load('data/spider/spider2.png').convert_alpha()
+spider_frame_2 = pygame.image.load('data/spider/паук для игры 2.png').convert_alpha()
 # Объединяем изображения
-# spider_frames = [spider_frame_1, spider_frame_2]
+spider_frames = [spider_frame_1, spider_frame_2]
 # Добавляем значение анимации
 spider_frame_index = 0
 # Добавляем анимацию
-# snail_surf = spider_frames[spider_frame_index]
+snail_surf = spider_frames[spider_frame_index]
 # ----------------------------------------------------------------
 # Добавляем стрекозу в нашу игру
 # ----------------------------------------------------------------
 #  Добавляем 1 изображение
-# dragonfly_frame1 = pygame.image.load('data/dragonfly/dragonfly1.png').convert_alpha()
+dragonfly_frame1 = pygame.image.load('data/dragonfly/стрекоза для игры 1.png').convert_alpha()
 # Добавляем 2 изображение
-# dragonfly_frame2 = pygame.image.load('data/dragonfly/dragonfly2.png').convert_alpha()
+dragonfly_frame2 = pygame.image.load('data/dragonfly/стрекоза для игры 2.png').convert_alpha()
 # Объединяем изображения
-# dragonfly_frames = [dragonfly_frame1, dragonfly_frame2]
+dragonfly_frames = [dragonfly_frame1, dragonfly_frame2]
 # Добавляем значение анимации
 dragonfly_frame_index = 0
-
-
 # Добавляем анимацию
-# dragonfly_surf = dragonfly_frames[dragonfly_frame_index]
+dragonfly_surf = dragonfly_frames[dragonfly_frame_index]
+
+
 # ----------------------------------------------------------------
 # Функция terminate
 # ----------------------------------------------------------------
@@ -118,7 +119,7 @@ def start_screen():
     intro_text = ["Dino 2.0",
                   "В игре есть много разных и ",
                   "прикольных персонажей,",
-                   'каждый интересен по своему',
+                  'каждый интересен по своему',
                   'и очень опасен, буде осторожны!']
     # Подбирем фон
     fon = pygame.transform.scale(start_fon, (800, 400))
@@ -167,8 +168,25 @@ def start_screen():
         clock.tick(FPS)
 
 
+# ----------------------------------------------------------------------------
+# Функция display_score
+# ----------------------------------------------------------------------------
 def display_score():
-    pass
+    # Достаем шрифт
+    font6 = pygame.font.Font('data/font/19180.otf', 48)
+    # Получаем время с начала игры
+    tick = pygame.time.get_ticks()
+    # Вычисляем время от последней смерти
+    real_time = int(tick / 1000) - start_time
+    # Рендарим текст
+    score_image = font6.render(f'Счет {real_time}', 1, (0, 0, 0))
+    # Выставляем координаты
+    score_cord = score_image.get_rect(center=(400, 50))
+    # Отрисоваваем счетчик стор
+    screen.blit(score_image, score_cord)
+    return real_time
+
+
 def lose_screen():
     # Пропишем нужный нам текст
     intro_text = ["Dino 2.0",
@@ -223,6 +241,7 @@ def lose_screen():
         # Рисуем наш текст
         screen.blit(string_rendered, intro_rect)
 
+
 game_active = False
 start_screen()
 fon_music.stop()
@@ -237,14 +256,14 @@ while runn:
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
-                start_time  = int(pygame.time.get_ticks() / 1000)
+                start_time = int(pygame.time.get_ticks() / 1000)
 
     screen.fill((0, 0, 0))
     if game_active:
         screen.fill((0, 0, 0))
-        #screen.blit(sky, (0, 0))
-        #screen.blit(land, (0, 300))
-        #score = display_score()
+        screen.blit(sky, (0, 0))
+        screen.blit(land, (0, 260))
+        score = display_score()
 
     else:
         lose_screen()
