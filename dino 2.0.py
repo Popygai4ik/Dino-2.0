@@ -15,6 +15,10 @@ from random import randint
 # ----------------------------------------------------------------
 # Инициализируем pygame
 pygame.init()
+# Инициализируем иконку приложения
+icon = pygame.image.load('data/dino/динозавр для игры 1(стоит).png')
+# Установим иконку приложения
+pygame.display.set_icon(icon)
 # Обозначаем размер окна
 size = width, height = 800, 400
 # Выставляем значение кол-во кадров
@@ -41,8 +45,6 @@ fon_music = pygame.mixer.Sound('data/music/(fon)e4c1fdca51422a9.mp3')
 # Начинаем проигровать фоновую музыку
 fon_music.play(loops=-1)
 fon2_music = pygame.mixer.Sound('data/music/(fon)48bb90af8e1e401.mp3')
-# Добавим звук прыжка
-jump_music = pygame.mixer.Sound('data/music/cartoon-spring-boing-03 (mp3cut.net)(jump).mp3')
 # Добавляем звук проигрыша
 lose_music = pygame.mixer.Sound('data/music/jg-032316-sfx-video-game-game-over-3.mp3')
 # ----------------------------------------------------------------
@@ -56,25 +58,6 @@ lose_fon = pygame.image.load('data/lose_screen/iow_dinosaurisle.jpg')
 sky = pygame.image.load("data/sky/небо для игры.png")
 # Добавлем землю
 land = pygame.image.load("data/land/земля для игры.png")
-# ----------------------------------------------------------------
-# Дообавляем динозаврика в нашу игру
-# ----------------------------------------------------------------
-#  Добавляем 1 изображение динозаврика
-dino_walk_1 = pygame.image.load('data/dino/динозавр для игры 2(бег).png').convert_alpha()
-# Добавляем 2 изображение динозаврика
-dino_walk_2 = pygame.image.load('data/dino/динозавр для игры 3(бег).png').convert_alpha()
-# Объединяем изображения динозаврика
-dino_walk = [dino_walk_1, dino_walk_2]
-# Добавляем значение бега динозаврика
-dino_walk_index = 0
-# Добавляем изображение прыжка динозаврика
-dino_jump = pygame.image.load('data/dino/динозавр для игры 4(прыжок).png').convert_alpha()
-# Добавляем анимацию
-dino_surf = dino_walk[dino_walk_index]
-# Добавлем к динозаврику квадрат
-dino_rect = dino_surf.get_rect(midbottom=(80, 300))
-# Добавлем гравитацию динозаврику
-dino_gravity = 0
 # ----------------------------------------------------------------
 # Добавляем паучка в нашу игру
 # ----------------------------------------------------------------
@@ -112,6 +95,67 @@ def terminate():
 
 
 # ----------------------------------------------------------------
+# Класс Дино
+# ----------------------------------------------------------------
+class dino(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.i = 0
+        # ----------------------------------------------------------------
+        # Дообавляем динозаврика в нашу игру
+        # ----------------------------------------------------------------
+        #  Добавляем 1 изображение динозаврика
+        self.dino_walk_1 = pygame.image.load('data/dino/динозавр для игры 2(бег).png').convert_alpha()
+        # Добавляем 2 изображение динозаврика
+        self.dino_walk_2 = pygame.image.load('data/dino/динозавр для игры 3(бег).png').convert_alpha()
+        # Объединяем изображения динозаврика
+        self.dino_walk = [self.dino_walk_1, self.dino_walk_2]
+        # Добавляем значение бега динозаврика
+        self.dino_walk_index = 0
+        # Добавляем анимацию
+        self.image = self.dino_walk[self.dino_walk_index]
+        # Добавлем к динозаврику квадрат
+        self.rect = self.image.get_rect(midbottom=(80, 300))
+        # Добавлем гравитацию динозаврику
+        self.dino_gravity = 0
+        # Добавляем изображение прыжка динозаврика
+        self.dino_jump = pygame.image.load('data/dino/динозавр для игры 4(прыжок).png').convert_alpha()
+        # ----------------------------------------------------------------
+        # Дообавляем музыку динозаврика в нашу игру
+        # ----------------------------------------------------------------
+        # Добавим звук прыжка
+        self.jump_music = pygame.mixer.Sound('data/music/cartoon-spring-boing-03 (mp3cut.net)(jump).mp3')
+        # Выставляем звук
+        self.jump_music.set_volume(0.5)
+
+    def key_down(self):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_SPACE] and self.rect.bottom >= 260:
+            self.dino_gravity = -20
+            self.jump_music.play()
+
+    def dino_animation(self):
+        if self.rect.bottom < 260:
+            self.image = self.dino_jump
+        else:
+            self.dino_walk_index += 0.1
+            if self.dino_walk_index >= len(self.dino_walk):
+                self.dino_walk_index = 0
+            self.image = self.dino_walk[int(self.dino_walk_index)]
+
+    def dino_gravityx(self):
+        self.dino_gravity += 1
+        self.rect.y += self.dino_gravity
+        if self.rect.bottom >= 260:
+            self.rect.bottom = 260
+
+    def update(self):
+        self.key_down()
+        self.dino_animation()
+        self.dino_gravityx()
+
+
+# ----------------------------------------------------------------
 # Функция start screen
 # ----------------------------------------------------------------
 def start_screen():
@@ -125,6 +169,7 @@ def start_screen():
     fon = pygame.transform.scale(start_fon, (800, 400))
     # Нарисуем наш фон
     screen.blit(fon, (0, 0))
+    # Выставим шрифт
     sh = pygame.font.Font('data/font/Sonic 1 Title Screen Filled.ttf', 4)
     # Выставляем шрифт
     font = pygame.font.Font('data/font/Sonic 1 Title Screen Filled.ttf', size_shrift)
@@ -243,6 +288,8 @@ def lose_screen():
 
 
 game_active = False
+dinos = pygame.sprite.GroupSingle()
+dinos.add(dino())
 start_screen()
 fon_music.stop()
 fon2_music.play(loops=-1)
@@ -264,6 +311,8 @@ while runn:
         screen.blit(sky, (0, 0))
         screen.blit(land, (0, 260))
         score = display_score()
+        dinos.draw(screen)
+        dinos.update()
 
     else:
         lose_screen()
