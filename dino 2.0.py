@@ -59,19 +59,6 @@ sky = pygame.image.load("data/sky/небо для игры.png")
 # Добавлем землю
 land = pygame.image.load("data/land/земля для игры.png")
 # ----------------------------------------------------------------
-# Добавляем паучка в нашу игру
-# ----------------------------------------------------------------
-#  Добавляем 1 изображение
-spider_frame_1 = pygame.image.load('data/spider/паук для игры 1.png').convert_alpha()
-# Добавляем 2 изображение
-spider_frame_2 = pygame.image.load('data/spider/паук для игры 2.png').convert_alpha()
-# Объединяем изображения
-spider_frames = [spider_frame_1, spider_frame_2]
-# Добавляем значение анимации
-spider_frame_index = 0
-# Добавляем анимацию
-snail_surf = spider_frames[spider_frame_index]
-# ----------------------------------------------------------------
 # Добавляем стрекозу в нашу игру
 # ----------------------------------------------------------------
 #  Добавляем 1 изображение
@@ -100,6 +87,7 @@ def terminate():
 class dino(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        # Ведём переменую i
         self.i = 0
         # ----------------------------------------------------------------
         # Дообавляем динозаврика в нашу игру
@@ -128,31 +116,123 @@ class dino(pygame.sprite.Sprite):
         # Выставляем звук
         self.jump_music.set_volume(0.5)
 
+    # ------------------------------------------------------------
+    # Функция key_down
+    # ------------------------------------------------------------
+
     def key_down(self):
+        # Получаем все клавиши которые нажаты
         key = pygame.key.get_pressed()
+        # Если нажат пробел и динозаврик на земле
         if key[pygame.K_SPACE] and self.rect.bottom >= 260:
+            # То dino_gravity = -20
             self.dino_gravity = -20
+            # И проигрываем звук прыжка
             self.jump_music.play()
 
+    # ------------------------------------------------------------
+    # Функция dino_animation
+    # ------------------------------------------------------------
     def dino_animation(self):
+        # Если динозаврик подпрыгнул
         if self.rect.bottom < 260:
+            # Cтавим изображение прыгающего динозаврика
             self.image = self.dino_jump
+        # Если не прыгает
         else:
+            # Отсчитываем dino_walk_index
             self.dino_walk_index += 0.1
+            # Если dino_walk_index больше длины dino_walk
             if self.dino_walk_index >= len(self.dino_walk):
+                # Обнуляем dino_walk_index
                 self.dino_walk_index = 0
+            # Cтавим изображение динозаврика
             self.image = self.dino_walk[int(self.dino_walk_index)]
 
+    # ------------------------------------------------------------
+    # Функция dino_gravityx
+    # ------------------------------------------------------------
+
     def dino_gravityx(self):
+        # Медленно возвращаем его обратно
         self.dino_gravity += 1
+        # Медленно возвращаем его обратно
         self.rect.y += self.dino_gravity
+        # Если он на земле
         if self.rect.bottom >= 260:
+            # Останавливаем его
             self.rect.bottom = 260
 
+    # ------------------------------------------------------------
+    # Функция update
+    # ------------------------------------------------------------
+
     def update(self):
+        # Вызываем key_down
         self.key_down()
+        # Вызываем dino_animation
         self.dino_animation()
+        # Вызываем dino_gravityx
         self.dino_gravityx()
+
+
+# ----------------------------------------------------------------
+# Функция spider
+# ----------------------------------------------------------------
+class Spider(pygame.sprite.Sprite):
+    #
+    def __init__(self):
+        super().__init__()
+        # ----------------------------------------------------------------
+        # Добавляем паучка в нашу игру
+        # ----------------------------------------------------------------
+        #  Добавляем 1 изображение
+        self.spider_frame_1 = pygame.image.load('data/spider/паук для игры 1.png').convert_alpha()
+        # Добавляем 2 изображение
+        self.spider_frame_2 = pygame.image.load('data/spider/паук для игры 2.png').convert_alpha()
+        # Объединяем изображения
+        self.spider_frames = [self.spider_frame_1, self.spider_frame_2]
+        # Добавляем значение анимации
+        self.spider_frame_index = 0
+        # Добавляем анимацию
+        spider_surf = self.spider_frames[self.spider_frame_index]
+        #
+        pos_land = 260
+        #
+        self.image = self.spider_frames[self.spider_frame_index]
+        #
+        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), pos_land))
+
+    # ------------------------------------------------------------
+    # Функция crash
+    # ------------------------------------------------------------
+
+    def crash(self):
+        if self.rect.x <= -80:
+            self.kill()
+
+    # ------------------------------------------------------------
+    # Функция spider_animation
+    # ------------------------------------------------------------
+    def spider_animation(self):
+        # Отсчитываем dino_walk_index
+        self.spider_frame_index += 0.1
+        # Если dino_walk_index больше длины dino_walk
+        if self.spider_frame_index >= len(self.spider_frames):
+            # Обнуляем dino_walk_index
+            self.spider_frame_index = 0
+        # Cтавим изображение динозаврика
+        self.image = self.spider_frames[int(self.spider_frame_index)]
+
+    # ------------------------------------------------------------
+    # Функция update
+    # ------------------------------------------------------------
+
+    def update(self):
+        # Вызываем dino_animation
+        self.spider_animation()
+        self.rect.x -= 4
+        self.crash()
 
 
 # ----------------------------------------------------------------
@@ -290,6 +370,8 @@ def lose_screen():
 game_active = False
 dinos = pygame.sprite.GroupSingle()
 dinos.add(dino())
+spiders = pygame.sprite.GroupSingle()
+spiders.add(Spider())
 start_screen()
 fon_music.stop()
 fon2_music.play(loops=-1)
@@ -311,6 +393,8 @@ while runn:
         screen.blit(sky, (0, 0))
         screen.blit(land, (0, 260))
         score = display_score()
+        spiders.draw(screen)
+        spiders.update()
         dinos.draw(screen)
         dinos.update()
 
