@@ -58,19 +58,6 @@ lose_fon = pygame.image.load('data/lose_screen/iow_dinosaurisle.jpg')
 sky = pygame.image.load("data/sky/небо для игры.png")
 # Добавлем землю
 land = pygame.image.load("data/land/земля для игры.png")
-# ----------------------------------------------------------------
-# Добавляем стрекозу в нашу игру
-# ----------------------------------------------------------------
-#  Добавляем 1 изображение
-dragonfly_frame1 = pygame.image.load('data/dragonfly/стрекоза для игры 1.png').convert_alpha()
-# Добавляем 2 изображение
-dragonfly_frame2 = pygame.image.load('data/dragonfly/стрекоза для игры 2.png').convert_alpha()
-# Объединяем изображения
-dragonfly_frames = [dragonfly_frame1, dragonfly_frame2]
-# Добавляем значение анимации
-dragonfly_frame_index = 0
-# Добавляем анимацию
-dragonfly_surf = dragonfly_frames[dragonfly_frame_index]
 
 
 # ----------------------------------------------------------------
@@ -197,29 +184,31 @@ class Spider(pygame.sprite.Sprite):
         # Добавляем анимацию
         spider_surf = self.spider_frames[self.spider_frame_index]
         #
-        pos_land = 260
+        self.pos_land = 260
         #
         self.image = self.spider_frames[self.spider_frame_index]
         #
-        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), pos_land))
+        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), self.pos_land))
 
     # ------------------------------------------------------------
     # Функция crash
     # ------------------------------------------------------------
 
     def crash(self):
+        #
         if self.rect.x <= -80:
+            #
             self.kill()
 
     # ------------------------------------------------------------
     # Функция spider_animation
     # ------------------------------------------------------------
     def spider_animation(self):
-        # Отсчитываем dino_walk_index
+        # Отсчитываем spider_walk_index
         self.spider_frame_index += 0.1
-        # Если dino_walk_index больше длины dino_walk
+        # Если spider_walk_index больше длины spider_walk
         if self.spider_frame_index >= len(self.spider_frames):
-            # Обнуляем dino_walk_index
+            # Обнуляем spider_walk_index
             self.spider_frame_index = 0
         # Cтавим изображение динозаврика
         self.image = self.spider_frames[int(self.spider_frame_index)]
@@ -229,9 +218,74 @@ class Spider(pygame.sprite.Sprite):
     # ------------------------------------------------------------
 
     def update(self):
-        # Вызываем dino_animation
+        # Вызываем spider_animation
         self.spider_animation()
+        #
         self.rect.x -= 4
+        #
+        self.crash()
+
+
+# ----------------------------------------------------------------
+# Функция spider
+# ----------------------------------------------------------------
+class Dragonfly(pygame.sprite.Sprite):
+    #
+    def __init__(self):
+        super().__init__()
+        # ----------------------------------------------------------------
+        # Добавляем стрекозу в нашу игру
+        # ----------------------------------------------------------------
+        #  Добавляем 1 изображение
+        self.dragonfly_frame1 = pygame.image.load('data/dragonfly/стрекоза для игры 1.png').convert_alpha()
+        # Добавляем 2 изображение
+        self.dragonfly_frame2 = pygame.image.load('data/dragonfly/стрекоза для игры 2.png').convert_alpha()
+        # Объединяем изображения
+        self.dragonfly_frames = [self.dragonfly_frame1, self.dragonfly_frame2]
+        # Добавляем значение анимации
+        self.dragonfly_frame_index = 0
+        # Добавляем анимацию
+        dragonfly_surf = self.dragonfly_frames[self.dragonfly_frame_index]
+        #
+        self.pos_land = 190
+        #
+        self.image = self.dragonfly_frames[self.dragonfly_frame_index]
+        #
+        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), self.pos_land))
+
+    # ------------------------------------------------------------
+    # Функция crash
+    # ------------------------------------------------------------
+
+    def crash(self):
+        #
+        if self.rect.x <= -80:
+            #
+            self.kill()
+
+    # ------------------------------------------------------------
+    # Функция dragonfly_animation
+    # ------------------------------------------------------------
+    def dragonfly_animation(self):
+        # Отсчитываем dragonfly_walk_index
+        self.dragonfly_frame_index += 0.1
+        # Если dragonfly_walk_index больше длины dragonfly_walk
+        if self.dragonfly_frame_index >= len(self.dragonfly_frames):
+            # Обнуляем dragonfly_walk_index
+            self.dragonfly_frame_index = 0
+        # Cтавим изображение стрекозы
+        self.image = self.dragonfly_frames[int(self.dragonfly_frame_index)]
+
+    # ------------------------------------------------------------
+    # Функция update
+    # ------------------------------------------------------------
+
+    def update(self):
+        # Вызываем dragonfly_animation
+        self.dragonfly_animation()
+        #
+        self.rect.x -= 4
+        #
         self.crash()
 
 
@@ -372,6 +426,8 @@ dinos = pygame.sprite.GroupSingle()
 dinos.add(dino())
 spiders = pygame.sprite.GroupSingle()
 spiders.add(Spider())
+dragonflys = pygame.sprite.GroupSingle()
+dragonflys.add(Dragonfly())
 start_screen()
 fon_music.stop()
 fon2_music.play(loops=-1)
@@ -397,6 +453,8 @@ while runn:
         spiders.update()
         dinos.draw(screen)
         dinos.update()
+        dragonflys.draw(screen)
+        dragonflys.update()
 
     else:
         lose_screen()
