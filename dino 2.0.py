@@ -221,7 +221,7 @@ class Spider(pygame.sprite.Sprite):
         # Вызываем spider_animation
         self.spider_animation()
         #
-        self.rect.x -= 4
+        self.rect.x -= 6
         #
         self.crash()
 
@@ -246,11 +246,11 @@ class Dragonfly(pygame.sprite.Sprite):
         self.dragonfly_frame_index = 0
         # Добавляем анимацию
         dragonfly_surf = self.dragonfly_frames[self.dragonfly_frame_index]
-        #
+        # Выставляем позицию стрекозы
         self.pos_land = 190
-        #
+        # Ставим изображение
         self.image = self.dragonfly_frames[self.dragonfly_frame_index]
-        #
+        # выставляем нашей стрекозе позицию
         self.rect = self.image.get_rect(midbottom=(randint(900, 1100), self.pos_land))
 
     # ------------------------------------------------------------
@@ -258,9 +258,9 @@ class Dragonfly(pygame.sprite.Sprite):
     # ------------------------------------------------------------
 
     def crash(self):
-        #
+        # если стрекоза ушла с экрана
         if self.rect.x <= -80:
-            #
+            # Уничтожим её
             self.kill()
 
     # ------------------------------------------------------------
@@ -283,9 +283,9 @@ class Dragonfly(pygame.sprite.Sprite):
     def update(self):
         # Вызываем dragonfly_animation
         self.dragonfly_animation()
-        #
-        self.rect.x -= 4
-        #
+        # Делаем чтоб наша стрекоза летела на право
+        self.rect.x -= 5
+        # Вызываем функцию crash
         self.crash()
 
 
@@ -421,23 +421,28 @@ def lose_screen():
         screen.blit(string_rendered, intro_rect)
 
 
+timer_spawn = pygame.USEREVENT + 10
+pygame.time.set_timer(timer_spawn, 2000)
 game_active = False
 dinos = pygame.sprite.GroupSingle()
 dinos.add(dino())
-spiders = pygame.sprite.GroupSingle()
-spiders.add(Spider())
-dragonflys = pygame.sprite.GroupSingle()
-dragonflys.add(Dragonfly())
 start_screen()
 fon_music.stop()
 fon2_music.play(loops=-1)
+animals = ['spider', 'spider', 'spider', 'dragonfly']
+group = pygame.sprite.Group()
 runn = True
 while runn:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             runn = False
         if game_active:
-            pass
+            if event.type == timer_spawn:
+                type = choice(animals)
+                if type == 'spider':
+                    group.add(Spider())
+                elif type == 'dragonfly':
+                    group.add(Dragonfly())
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
@@ -448,13 +453,12 @@ while runn:
         screen.fill((0, 0, 0))
         screen.blit(sky, (0, 0))
         screen.blit(land, (0, 260))
+
         score = display_score()
-        spiders.draw(screen)
-        spiders.update()
         dinos.draw(screen)
         dinos.update()
-        dragonflys.draw(screen)
-        dragonflys.update()
+        group.draw(screen)
+        group.update()
 
     else:
         lose_screen()
