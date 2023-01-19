@@ -183,9 +183,9 @@ class Spider(pygame.sprite.Sprite):
         self.spider_frame_index = 0
         # Добавляем анимацию
         spider_surf = self.spider_frames[self.spider_frame_index]
-        #
+        # Выставляем позицию
         self.pos_land = 260
-        #
+        # Выставляем изображение
         self.image = self.spider_frames[self.spider_frame_index]
         #
         self.rect = self.image.get_rect(midbottom=(randint(900, 1100), self.pos_land))
@@ -220,9 +220,9 @@ class Spider(pygame.sprite.Sprite):
     def update(self):
         # Вызываем spider_animation
         self.spider_animation()
-        #
+        # Делаем чтоб наша стрекоза литела
         self.rect.x -= 6
-        #
+        # Вызываем функцию crash
         self.crash()
 
 
@@ -247,7 +247,7 @@ class Dragonfly(pygame.sprite.Sprite):
         # Добавляем анимацию
         dragonfly_surf = self.dragonfly_frames[self.dragonfly_frame_index]
         # Выставляем позицию стрекозы
-        self.pos_land = 190
+        self.pos_land = randint(160, 190)
         # Ставим изображение
         self.image = self.dragonfly_frames[self.dragonfly_frame_index]
         # выставляем нашей стрекозе позицию
@@ -421,14 +421,15 @@ def lose_screen():
         screen.blit(string_rendered, intro_rect)
 
 
-timer_spawn = pygame.USEREVENT + 10
-pygame.time.set_timer(timer_spawn, 2000)
+timer_spawn = pygame.USEREVENT + 1
+pygame.time.set_timer(timer_spawn, 1900)
 game_active = False
 dinos = pygame.sprite.GroupSingle()
 dinos.add(dino())
 start_screen()
 fon_music.stop()
 fon2_music.play(loops=-1)
+fon2_music.set_volume(0.2)
 animals = ['spider', 'spider', 'spider', 'dragonfly']
 group = pygame.sprite.Group()
 runn = True
@@ -450,7 +451,6 @@ while runn:
 
     screen.fill((0, 0, 0))
     if game_active:
-        screen.fill((0, 0, 0))
         screen.blit(sky, (0, 0))
         screen.blit(land, (0, 260))
 
