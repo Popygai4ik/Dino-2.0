@@ -366,6 +366,9 @@ def display_score():
     return real_time
 
 
+# ----------------------------------------------------------------------------
+# Функция lose_screen
+# ----------------------------------------------------------------------------
 def lose_screen():
     # Пропишем нужный нам текст
     intro_text = ["Dino 2.0",
@@ -421,48 +424,100 @@ def lose_screen():
         screen.blit(string_rendered, intro_rect)
 
 
+# ----------------------------------------------------------------------------
+# Функция collision_crasheck
+# ----------------------------------------------------------------------------
+def collision_crasheck():
+    # Проверяем есть ли столкновение динозаврика
+    if pygame.sprite.spritecollide(dinos.sprite, group, False):
+        # Очищаем нашу группу с объектами
+        group.empty()
+        # Возращаем False
+        return False
+    # Возращаем True
+    return True
+
+
+# ----------------------------------------------------------------------------
+# Таймер спавна стрекоз и пауков
+# ----------------------------------------------------------------------------
+# Отсчитываем время
 timer_spawn = pygame.USEREVENT + 1
+# Выставляем таймер
 pygame.time.set_timer(timer_spawn, 1900)
+# Добавляем переменную game_active
 game_active = False
+# Создаем спрайт dinos
 dinos = pygame.sprite.GroupSingle()
+# Добавляем в dinos класс dino
 dinos.add(dino())
+# Вызываем функцию start_screen
 start_screen()
+# Останавливаем стартовую музыку
 fon_music.stop()
+# Начинаем бесконечно проигрывать новую фоновую музыку
 fon2_music.play(loops=-1)
+# Выставляем ей громкость
 fon2_music.set_volume(0.2)
+# Прописываем множество наших животных
 animals = ['spider', 'spider', 'spider', 'dragonfly']
+# Создаем группу с наши животными
 group = pygame.sprite.Group()
-runn = True
-while runn:
+# Добавляем переменую glavnai_run
+glavnai_run = True
+# Запускаем главный цикл
+while glavnai_run:
+    # Перебераем все события
     for event in pygame.event.get():
+        # Если приложение закрывается
         if event.type == pygame.QUIT:
-            runn = False
+            # Закрывам приложение
+            glavnai_run = False
+        # Ести game_active = True
         if game_active:
+            # Если таймер подошел для спавна
             if event.type == timer_spawn:
+                # Выбираем рандомно персонажа
                 type = choice(animals)
+                # Если это паук
                 if type == 'spider':
+                    # Добавляем паука в группу для преграды
                     group.add(Spider())
+                # Если это стрекоза
                 elif type == 'dragonfly':
+                    # Добавляем стрекозу в группу для преграды
                     group.add(Dragonfly())
+        # Если нет
         else:
+            # Если нажата клавиша и это клавиша пробел
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                # делаем игру активной
                 game_active = True
+                # И заменяем стартовое время на время смерти
                 start_time = int(pygame.time.get_ticks() / 1000)
-
-    screen.fill((0, 0, 0))
+    # Если игра активна
     if game_active:
+        # Рисуем небо
         screen.blit(sky, (0, 0))
+        # Рисуем землю
         screen.blit(land, (0, 260))
-
+        # Вычисляем счет
         score = display_score()
+        # Рисуем динозаврика
         dinos.draw(screen)
+        # Обновляем спрайт динос
         dinos.update()
+        # Отрисоваваем группу с препятствиями
         group.draw(screen)
+        # Обновляем препятствия
         group.update()
-
+        # Проверяем столкновения
+        game_active = collision_crasheck()
+    # Если игра остановлена
     else:
+        # Показываем экран проигрыша
         lose_screen()
-
+    # Ставим скорость отображения
     clock.tick(FPS)
     pygame.display.flip()
 pygame.quit()
