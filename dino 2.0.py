@@ -182,7 +182,7 @@ class Spider(pygame.sprite.Sprite):
         # Добавляем значение анимации
         self.spider_frame_index = 0
         # Добавляем анимацию
-        spider_surf = self.spider_frames[self.spider_frame_index]
+        self.spider_surf = self.spider_frames[self.spider_frame_index]
         # Выставляем позицию
         self.pos_land = 260
         # Выставляем изображение
@@ -245,7 +245,7 @@ class Dragonfly(pygame.sprite.Sprite):
         # Добавляем значение анимации
         self.dragonfly_frame_index = 0
         # Добавляем анимацию
-        dragonfly_surf = self.dragonfly_frames[self.dragonfly_frame_index]
+        self.dragonfly_surf = self.dragonfly_frames[self.dragonfly_frame_index]
         # Выставляем позицию стрекозы
         self.pos_land = randint(160, 190)
         # Ставим изображение
@@ -316,7 +316,7 @@ def start_screen():
             # Выставляем шрифт
             font2 = pygame.font.Font('data/font/Motel King Medium(RUS by Slavchansky).ttf', 57)
             # Рендарим текст
-            string_rendered = font2.render(line, 1, pygame.Color('red'))
+            string_rendered = font2.render(line, True, pygame.Color('red'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -325,7 +325,7 @@ def start_screen():
             text_coord += 125
         else:
             # Рендарим текст
-            string_rendered = font.render(line, 1, pygame.Color('Green'))
+            string_rendered = font.render(line, True, pygame.Color('Green'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -358,7 +358,7 @@ def display_score():
     # Вычисляем время от последней смерти
     real_time = int(tick / 1000) - start_time
     # Рендарим текст
-    score_image = font6.render(f'Счет {real_time}', 1, (0, 0, 0))
+    score_image = font6.render(f'Счет {real_time}', True, (0, 0, 0))
     # Выставляем координаты
     score_cord = score_image.get_rect(center=(400, 50))
     # Отрисоваваем счетчик стор
@@ -393,7 +393,7 @@ def lose_screen():
             # Выставляем шрифт
             font2 = pygame.font.Font('data/font/Motel King Medium(RUS by Slavchansky).ttf', 57)
             # Рендарим текст
-            string_rendered = font2.render(line, 1, pygame.Color('red'))
+            string_rendered = font2.render(line, True, pygame.Color('red'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -404,7 +404,7 @@ def lose_screen():
             # Выставляем шрифт
             font4 = pygame.font.Font('data/font/MultiroundPro.otf', 59)
             # Рендарим текст
-            string_rendered = font4.render(f'Ваш результат {score}.', 1, pygame.Color('yellow'))
+            string_rendered = font4.render(f'Ваш результат {score}.', True, pygame.Color('yellow'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -414,7 +414,7 @@ def lose_screen():
         elif line != '1' and line != 'Dino 2.0':
             font3 = pygame.font.Font('data/font/DolomanPavljenko.otf', 45)
             # Рендарим текст
-            string_rendered = font3.render(line, 1, pygame.Color('white'))
+            string_rendered = font3.render(line, True, pygame.Color('white'))
             intro_rect = string_rendered.get_rect()
             text_coord += 10
             intro_rect.top = text_coord
@@ -432,6 +432,12 @@ def collision_crasheck():
     if pygame.sprite.spritecollide(dinos.sprite, group, False):
         # Очищаем нашу группу с объектами
         group.empty()
+        # Притушим фоновую музыку
+        fon2_music.set_volume(0.001)
+        # Устанавливаем громкосить музыки проигрыша
+        lose_music.set_volume(0.3)
+        # Проигроваем музыку проигрыша
+        lose_music.play()
         # Возращаем False
         return False
     # Возращаем True
@@ -446,23 +452,36 @@ timer_spawn = pygame.USEREVENT + 1
 # Выставляем таймер
 pygame.time.set_timer(timer_spawn, 1900)
 # Добавляем переменную game_active
-game_active = False
+game_active = True
+# ----------------------------------------------------------------------------
+# Основные спрайты
+# ----------------------------------------------------------------------------
+# Прописываем множество наших животных
+animals = ['spider', 'spider', 'spider', 'dragonfly']
+# Создаем группу с наши животными
+group = pygame.sprite.Group()
 # Создаем спрайт dinos
 dinos = pygame.sprite.GroupSingle()
 # Добавляем в dinos класс dino
 dinos.add(dino())
 # Вызываем функцию start_screen
 start_screen()
+# ----------------------------------------------------------------------------
+# Настраиваем музыку
+# ----------------------------------------------------------------------------
 # Останавливаем стартовую музыку
 fon_music.stop()
 # Начинаем бесконечно проигрывать новую фоновую музыку
 fon2_music.play(loops=-1)
 # Выставляем ей громкость
 fon2_music.set_volume(0.2)
-# Прописываем множество наших животных
-animals = ['spider', 'spider', 'spider', 'dragonfly']
-# Создаем группу с наши животными
-group = pygame.sprite.Group()
+# ----------------------------------------------------------------------------
+# Основные перменые
+# ----------------------------------------------------------------------------
+# Добавляем переменную game_active
+game_active = True
+# Добавляем переменную type
+type = ""
 # Добавляем переменую glavnai_run
 glavnai_run = True
 # Запускаем главный цикл
@@ -497,6 +516,7 @@ while glavnai_run:
                 start_time = int(pygame.time.get_ticks() / 1000)
     # Если игра активна
     if game_active:
+        fon2_music.set_volume(0.2)
         # Рисуем небо
         screen.blit(sky, (0, 0))
         # Рисуем землю
